@@ -32,16 +32,10 @@
 
 // SPO2 register bits
 #define HRM_SPOC_HIRES          (1<<6)
-
 #define HRM_SPOC_SRC_50         0x00
-#define HRM_SPOC_SRC_100        0x01
-#define HRM_SPOC_SRC_167        0x02
-#define HRM_SPOC_SRC_200        0x03
-#define HRM_SPOC_SRC_400        0x04
-#define HRM_SPOC_SRC_600        0x05
-#define HRM_SPOC_SRC_800        0x06
-#define HRM_SPOC_SRC_1000       0x07
-
+#define HRM_SPOC_SRC_200        (1<<3) | (1<<2)
+#define HRM_SPOC_SRC_600        (1<<4) | (1<<2)
+#define HRM_SPOC_SRC_1000       (1<<4) | (1<<3) | (1<<2)
 // also controls led pulse width
 #define HRM_SPOC_ADCRES_13B     0x00            // 200us
 #define HRM_SPOC_ADCRES_14B     (1<<0)          // 400us
