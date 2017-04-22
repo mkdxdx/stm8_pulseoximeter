@@ -84,7 +84,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 19 22 21 24 26 28 7 3 2</file>
+=======
+          <file> 19 22 60 21 24 26 28 7 3 2</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 2 7 19 3 60 28 22 21 26</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -103,7 +111,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 19 22 21 24 26 28 7 3</file>
+=======
+          <file> 19 22 60 21 24 26 28 7 3</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26 19 3 22 21 7 60 24 28</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -126,11 +142,38 @@
         <tool>
           <name>BICOMP</name>
           <file> 59</file>
+<<<<<<< HEAD
+=======
         </tool>
       </outputs>
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+          <file> 15 19 22 60 21 24 26 28 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26 19 22 21 15 7 60 24 28</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICCSTM8</name>
+          <file> 34</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 15 19 22 21 24 26 28 7</file>
         </tool>
       </inputs>
@@ -151,6 +194,13 @@
         <tool>
           <name>ICCSTM8</name>
           <file> 19 22 21 24 26 28 7 18 2 9 43 44 48 49 50 41 12 10 11</file>
+=======
+          <file> 9 43 44 48 49 50 41 12 10 11 19 22 60 21 24 26 28 7 18 2 15</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 43 41 2 44 22 19 48 12 21 11 18 15 10 49 50 26 9 7 60 24 28</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -169,7 +219,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 19 22 21 24 26 28 7 3 18</file>
+=======
+          <file> 19 22 60 21 24 26 28 7 3 18</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26 19 18 22 21 3 7 60 24 28</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -188,7 +246,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 21 19 22 24 26 28 7</file>
+=======
+          <file> 21 19 22 60 24 26 28 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26 19 22 21 7 60 24 28</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -207,7 +273,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 24 19 22 21 26 28 7</file>
+=======
+          <file> 24 19 22 60 21 26 28 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 21 22 19 26 24 7 60 28</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -226,7 +300,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 26 19 22 21 24 28 7</file>
+=======
+          <file> 26 19 22 60 21 24 28 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19 60 28 7 24 26 22 21</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -245,7 +327,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 28 19 22 21 24 26 7</file>
+=======
+          <file> 28 19 22 60 21 24 26 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 26 19 22 21 28 7 60 24</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -264,7 +354,15 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
+<<<<<<< HEAD
           <file> 30 19 22 21 24 26 28 7</file>
+=======
+          <file> 30 19 22 60 21 24 26 28 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 7 19 60 28 22 21 26 30</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>
@@ -280,6 +378,32 @@
         <tool>
           <name>ILINK</name>
           <file> 37 58 42 32 34 53 56 55 6 45 8 39 13 46</file>
+<<<<<<< HEAD
+=======
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\stm8s_adc1.c</name>
+      <outputs>
+        <tool>
+          <name>ICCSTM8</name>
+          <file> 56</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 57</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCSTM8</name>
+          <file> 60 19 22 21 24 26 28 7</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 19 24 7 60 28 22 21 26</file>
+>>>>>>> parent of bb7d078... Revert "few fixes"
         </tool>
       </inputs>
     </file>

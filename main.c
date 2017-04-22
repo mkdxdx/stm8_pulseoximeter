@@ -1,8 +1,16 @@
+#include <stdlib.h>
+#include <limits.h>
+
+
 #include "stm8s.h"
 #include "oled1306/oled1306.h"
 #include "max30100/hrm.h"
-#include <stdlib.h>
-#include <limits.h>
+
+#include "filter.h"
+
+#define BATT_FULL       40700          // approx 2.07V on ADIN2
+#define BATT_LOW        BATT_FULL*0.6796F // approx 1.4V on ADIN2
+#define BATT_SCALE      BATT_FULL-BATT_LOW
 
 #define LED_PORT        GPIOD
 #define LED_PIN         GPIO_PIN_3
@@ -18,41 +26,49 @@
 #define PLOT_TOP        0x02
 #define PLOT_BOTTOM     0x06
 #define PLOT_LEFT       0x00
-#define PLOT_RIGHT      OLED1306_LCDWIDTH/3
+#define PLOT_RIGHT      OLED1306_LCDWIDTH/2
 #define PLOT_MAXY       PLOT_BOTTOM*8-1
 #define PLOT_MINY       PLOT_TOP*8
 #define PLOT_RANGE      32
 
 #define CONV_DIGITS     5  // for unsigned short, 10 for unsigned long
-
-#define SAMPLE_COUNT    4
-#define PEAK_THRESHOLD  12
-
+#define SAMPLE_COUNT    5
 #define AVG_WIDTH       2
 
-#define FILTER_ALPHA    0.9
+
+
+enum E_PULSE_STATE {
+  PS_RISING = 0,
+  PS_FALLING
+};
 
 
 
 void Delay(uint16_t nCount);
 void I2C_Setup(void);
 void convUI16toStr( uint16_t num, char *ptr );
-void Screen_Plot(uint8_t x, int16_t, uint16_t range);
+void Screen_Plot(uint8_t x, int16_t y);
 void Timer_Reset(void);
 void Timer_Config(void);
 void Timer_Start(void);
 uint16_t Timer_Stop(void);
 uint8_t FindPeaks(int16_t v, int16_t range);
 void Screen_Peak(uint8_t x);
-uint32_t DCFilter(int16_t v, int16_t pv);
+void ADC_Config(void);
+uint16_t ADC_GetValue(void);
+uint8_t getBattery(void);
+
 
 const char val[] = "123";
-const char hrmok[] = "HRM OK";
-const char hrmfail[] = "HRM FAIL";
+const char hrmok[] = "OK";
+const char hrmfail[] = "FAIL";
 const char empts[] = "     ";
 
-volatile uint16_t bpm = 0;
+volatile uint16_t prevbpm = 0;
 volatile int16_t range = 0;
+volatile int16_t rd2 = 0;
+volatile int16_t rd3 = 0;
+volatile int16_t rd4 = 0;
 volatile uint16_t scale_m = 0;
 volatile int16_t max = SHRT_MIN;
 volatile int16_t min = SHRT_MAX;
@@ -61,6 +77,10 @@ volatile int16_t prevw = 0;
 volatile uint16_t prevt = 0;
 volatile uint16_t dt = 0;
 volatile int16_t samples[SAMPLE_COUNT];
+
+
+
+
 
 char u16val[5];
 
@@ -74,35 +94,42 @@ int main( void )
   
   GPIO_Init(LED_PORT, LED_PIN, GPIO_MODE_OUT_PP_LOW_FAST);
   
-  I2C_Setup();
   
+  I2C_Setup();
+
   OLED1306_init();
   OLED1306_Clear();
-  
- 
+
   HRM_WriteReg(HRM_REG_MODE_CONF,(HRM_MODE_RESET));
   HRM_WriteReg(HRM_REG_MODE_CONF,(HRM_MODE_HRONLY));
-  HRM_WriteReg(HRM_REG_SPO2_CONF,(HRM_SPOC_SRC_50 | HRM_SPOC_ADCRES_16B));
-  HRM_WriteReg(HRM_REG_LED_CONF,(HRM_LED_IR_C_5));
+  HRM_WriteReg(HRM_REG_SPO2_CONF,(HRM_SPOC_SRC_1000 | HRM_SPOC_ADCRES_14B));
+  HRM_WriteReg(HRM_REG_LED_CONF,(HRM_LED_IR_C_9));
+  
   
   uint8_t x = 0;
   
   Timer_Config();
   Timer_Start();
   
+  ADC_Config();
+  
+
+  
   while (1)
   {
     /* Toggles LEDs */
     
     OLED1306_SetPos(0,0);
+    uint8_t status = HRM_IsOk();
     
-    
-    if (HRM_IsOk()) {
-      OLED1306_Puts((char*)hrmok);
+    if (status) {
+      
       
       uint32_t fd = HRM_ReadFIFO();
       
-      int16_t ir = (int16_t)((fd & 0xFFFF0000)>>16);
+      int16_t ir = (int16_t)((fd & 0xFFFF0000)>>16); 
+      
+      // red led value omission - until i will figure out a reliable way to measure SPO2
       //int16_t rd = (int16_t)(fd & 0x0000FFFF);
       
       uint32_t dc = DCFilter(ir,prevw);
@@ -110,34 +137,55 @@ int main( void )
       ir = (int16_t)(0x0000FFFF & dc);
       prevw = (int16_t)(0xFFFF0000 &(dc>>16));
       
+      ir = MeanMedian(ir);
+      ir = BWorthFilter(ir);
+    
+      
       if (ir<min)
         min = ir;
       
       if (ir>max)
         max = ir;
     
-      Screen_Plot(x,ir-moffset,range);
       
+      Screen_Plot(x,ir);
       
-      if (FindPeaks(ir,range) == 1) {
-        Screen_Peak(x);
+      if (FindPeaks(ir,range)) {
         uint16_t ts = TIM1_GetCounter();
-        dt = ts - prevt;
+        if (ts-prevt>50) {
+          Screen_Peak(x);
+          dt = ts - prevt;
+        }
+        
+
         prevt = ts; 
       }
       
-      bpm = (uint16_t)((uint16_t)60000 / dt);
-   
+      uint16_t tbpm = (uint16_t)((uint16_t)60000 / dt);
+      uint16_t bpm = 0;
+      if (tbpm<=300) {
+        bpm = (tbpm + prevbpm)>>1;
+        prevbpm = bpm;
+      }
       
+     
       x++;
       if (x>PLOT_RIGHT) {
         x = PLOT_LEFT;
         moffset = min;
         range = (max - min);  
-        scale_m = range/PLOT_RANGE;
+        rd2 = range/2;
+        rd3 = range/3;
+        rd4 = rd2/2;
+        
         max = SHRT_MIN;
         min = SHRT_MAX; 
-        
+      
+        status = HRM_IsOk();
+        if (status) { 
+          OLED1306_SetPos(0,0);
+          OLED1306_Puts((char*)hrmok); 
+        }
         for (uint8_t sy = 0; sy<OLED1306_LCDHEIGHT; sy++) {
           OLED1306_SetPos(64,sy);
           for (uint8_t sx = 64; sx<OLED1306_LCDWIDTH; sx++) {
@@ -146,24 +194,27 @@ int main( void )
         }
         convUI16toStr(bpm,u16val);
         OLED1306_Putdigitval(u16val,64,2);
+        
+        // battery
+        OLED1306_SetPos(0,7);
+        convUI16toStr(getBattery(),u16val);
+        OLED1306_Puts(u16val);
+        OLED1306_PutChar('%');
       }
     }
-     else
+    else {
       OLED1306_Puts((char*)hrmfail);
+      status = HRM_IsOk();
+    }
+      
     
     GPIO_WriteReverse(LED_PORT,LED_PIN);
-    while (!(TIM1_GetCounter()%30==0)) {} // refresh screen every 30ms~
+    while (!(TIM1_GetCounter()%10==0)) {} // every 10 ms 
   }
   return 0;
 }
 
 
-uint32_t DCFilter(int16_t v, int16_t pv) {
-  int16_t w = v + FILTER_ALPHA * pv;
-  int16_t wn = (w - pv);
-  uint32_t result = (uint32_t)(((uint32_t)w<<16)| wn );
-  return result;
-}
 
 
 
@@ -179,10 +230,6 @@ void assert_failed(u8* file, u32 line)
 {
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
- 
-  
- 
-  
   /* Infinite loop */
   while (1)
   {
@@ -229,9 +276,10 @@ void convUI16toStr( uint16_t num, char *ptr )
 }
 
 
-void Screen_Plot(uint8_t x, int16_t yv, uint16_t range) {
-  uint8_t sv = (uint8_t)(yv/scale_m);
-  uint8_t y = sv+PLOT_MINY;
+void Screen_Plot(uint8_t x, int16_t yv) {
+  int8_t y = 32-(yv-moffset)/3;
+ 
+ 
   
   for (uint8_t py = PLOT_TOP; py<PLOT_BOTTOM; py++) {
     OLED1306_SetPos(x,py);
@@ -243,14 +291,16 @@ void Screen_Plot(uint8_t x, int16_t yv, uint16_t range) {
   if (y<PLOT_MINY) 
     y = PLOT_MINY;
   
+  if (x%2==0) {
+    OLED1306_SetPixel(x,32);
+  }
+  
   OLED1306_SetPixel(x,y);
 }
 
 void Screen_Peak(uint8_t x) {
-  for (uint8_t py = PLOT_TOP; py<PLOT_BOTTOM; py++) {
-    OLED1306_SetPos(x,py);
-    OLED1306_Data(0xFF);
-  }
+  OLED1306_SetPos(x,PLOT_TOP+1);
+  OLED1306_Data(0xFF);
 }
 
 void Timer_Reset(void) {
@@ -273,24 +323,46 @@ uint16_t Timer_Stop(void) {
   return TIM1_GetCounter();
 }
 
+void ADC_Config(void) {
+  ADC1_DeInit();
+  // single conversion, channel 2, fclk/8, no external trigger, align left, no schmitt trigger,
+  ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,ADC1_CHANNEL_2,ADC1_PRESSEL_FCPU_D8, 0,DISABLE, ADC1_ALIGN_LEFT, 0,DISABLE);
+  ADC1_Cmd(ENABLE);
+}
+
+uint16_t ADC_GetValue(void) {
+  ADC1_StartConversion();
+  while (!ADC1_GetFlagStatus(ADC1_FLAG_EOC)) {}
+  return ADC1_GetConversionValue();
+}
+
 uint8_t FindPeaks(int16_t v, int16_t range) {
   for (uint8_t i = 1; i<SAMPLE_COUNT; i++)
     samples[i-1] = samples[i];
-  
   samples[SAMPLE_COUNT-1] = v;
   
-  int16_t slope = 0;
-  for (uint8_t i = 1; i<SAMPLE_COUNT; i++) 
-    slope += (samples[i-1] - samples[i]);
-  
- 
-  
-  if (slope >= (range/2)) {
-    for (uint8_t i = 0; i<SAMPLE_COUNT; i++)
-      samples[i] = 0;
-    return 1;
+  int8_t slope = 0;
+  for (uint8_t i = 1; i<SAMPLE_COUNT; i++) {
+    if (samples[i-1]<samples[i]) {
+      slope++;
+    } else {
+      slope--;
+    }
   }
-    
-  else
+  
+  if (v>=(int16_t)((moffset+rd2+rd4)) && (slope >= SAMPLE_COUNT-2)) {
+    return 1;
+  } else {
     return 0;
+  }
 }
+
+// get battery status in %
+uint8_t getBattery(void) {
+  uint16_t adv = (ADC_GetValue() & 0xFF00);
+  float scaled = adv-BATT_LOW;
+  float bscal = BATT_SCALE;
+  float perc = (scaled/bscal)*100;
+  return (uint8_t)perc;
+}
+
