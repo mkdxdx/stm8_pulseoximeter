@@ -84,7 +84,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 19 22 60 21 24 26 28 7 3 2</file>
+          <file> 19 22 21 24 26 28 7 3 2</file>
         </tool>
       </inputs>
     </file>
@@ -103,7 +103,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 19 22 60 21 24 26 28 7 3</file>
+          <file> 19 22 21 24 26 28 7 3</file>
         </tool>
       </inputs>
     </file>
@@ -131,7 +131,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 15 19 22 60 21 24 26 28 7</file>
+          <file> 15 19 22 21 24 26 28 7</file>
         </tool>
       </inputs>
     </file>
@@ -169,11 +169,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 19 22 60 21 24 26 28 7 3 18</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 7 19 18 26 3 21 22 24 28</file>
+          <file> 19 22 21 24 26 28 7 3 18</file>
         </tool>
       </inputs>
     </file>
@@ -192,7 +188,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 21 19 22 60 24 26 28 7</file>
+          <file> 21 19 22 24 26 28 7</file>
         </tool>
       </inputs>
     </file>
@@ -211,7 +207,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 24 19 22 60 21 26 28 7</file>
+          <file> 24 19 22 21 26 28 7</file>
         </tool>
       </inputs>
     </file>
@@ -230,7 +226,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 26 19 22 60 21 24 28 7</file>
+          <file> 26 19 22 21 24 28 7</file>
         </tool>
       </inputs>
     </file>
@@ -249,7 +245,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 28 19 22 60 21 24 26 7</file>
+          <file> 28 19 22 21 24 26 7</file>
         </tool>
       </inputs>
     </file>
@@ -268,7 +264,7 @@
       <inputs>
         <tool>
           <name>ICCSTM8</name>
-          <file> 30 19 22 60 21 24 26 28 7</file>
+          <file> 30 19 22 21 24 26 28 7</file>
         </tool>
       </inputs>
     </file>
@@ -291,20 +287,10 @@
       <name>$PROJ_DIR$\stm8s_adc1.c</name>
       <outputs>
         <tool>
-          <name>ICCSTM8</name>
-          <file> 56</file>
-        </tool>
-        <tool>
           <name>BICOMP</name>
           <file> 57</file>
         </tool>
       </outputs>
-      <inputs>
-        <tool>
-          <name>ICCSTM8</name>
-          <file> 60 19 22 21 24 26 28 7</file>
-        </tool>
-      </inputs>
     </file>
   </configuration>
   <configuration>
