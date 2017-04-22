@@ -1607,6 +1607,12 @@
     </file>
   </group>
   <file>
+    <name>$PROJ_DIR$\filter.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\filter.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\i2c_gen.c</name>
   </file>
   <file>
@@ -1617,6 +1623,12 @@
   </file>
   <file>
     <name>$PROJ_DIR$\stm8s.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\stm8s_adc1.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\stm8s_adc1.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\stm8s_clk.c</name>
